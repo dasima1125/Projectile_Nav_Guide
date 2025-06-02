@@ -182,16 +182,11 @@ public static class TLogic2D
         float b = Vector2.Dot(displacement, TNS.velocity) * 2;
         float c = Vector2.Dot(displacement, displacement);
         float discriminant = b * b - 4 * a * c;
-        if (discriminant < 0 || Mathf.Abs(a) < 0.0001f)
-        {
-            // If you adjust this extra well, 
-            // I think you'll be able to hit the target even if the speed is lower or the same.. 
-            // I'll do it, but I don't know if it'll work
-            // But I think this wouldn't really be a linear lead algorithm anymore.
 
-            /*
+        if (discriminant < 0 || Mathf.Abs(a) < 0.0001f || TNS.velocity.magnitude >= INS.Speed)
+        {
             float over = TNS.velocity.magnitude + 1;
-            Vector2 correctionbackPos = TNS.position + TNS.velocity * over;
+            Vector2 correctionbackPos = TNS.position + TNS.velocity.normalized * over;
             Vector2 correctionfallDir = (correctionbackPos - INS.position).normalized;
 
             leadTarget = correctionbackPos;
@@ -201,12 +196,8 @@ public static class TLogic2D
             float fixmaxDelta = maxAngularVelocity * Time.fixedDeltaTime;
             
             return Mathf.Clamp(fixangleDiff, -fixmaxDelta, fixmaxDelta);
-            */
-
-            leadTarget = TNS.position;
-            return 0f;
-        
         }
+        
 
         float rootP = (-b + Mathf.Sqrt(discriminant)) / (2 * a);
         float rootM = (-b - Mathf.Sqrt(discriminant)) / (2 * a);
@@ -238,7 +229,6 @@ public static class TLogic2D
 
         if (LOSsq < 0.0001f)
         {
-            //Debug.LogAssertion("Unable to compute angular velocity: LOS ≈ 0 (missile near target)");
             leadTarget = Vector2.zero;
             return null;
         }
